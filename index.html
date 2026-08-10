@@ -60,6 +60,7 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+      flex-shrink: 0;
     }
 
     .title {
@@ -121,6 +122,7 @@
       flex: 1;
       height: calc(100vh - 68px);
       gap: 10px;
+      min-height: 0;
     }
 
     /* Left Activity Bar */
@@ -135,6 +137,7 @@
       align-items: center;
       padding: 10px 0;
       gap: 12px;
+      flex-shrink: 0;
     }
 
     .activity-btn {
@@ -168,6 +171,7 @@
       flex-direction: column;
       overflow: hidden;
       transition: all 0.2s ease;
+      flex-shrink: 0;
     }
 
     .sidebar-panel.collapsed {
@@ -181,6 +185,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      min-height: 0;
     }
 
     .msg {
@@ -213,6 +218,7 @@
       flex-direction: column;
       gap: 8px;
       background: rgba(18, 19, 26, 0.7);
+      flex-shrink: 0;
     }
 
     .ai-input-box textarea {
@@ -244,6 +250,7 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 14px;
       overflow: hidden;
+      min-width: 0;
     }
 
     .panel-header {
@@ -258,6 +265,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .iframe-wrapper {
@@ -267,6 +275,7 @@
       border-radius: 8px;
       margin: 8px;
       overflow: hidden;
+      min-height: 0;
     }
 
     iframe#preview-frame {
@@ -280,6 +289,7 @@
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       cursor: row-resize;
       display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
     }
     .resize-handle:hover, .resize-handle.active { background: rgba(137, 180, 250, 0.3); }
     .resize-handle::after { content: ""; width: 32px; height: 2px; background: rgba(255, 255, 255, 0.2); }
@@ -289,9 +299,10 @@
       background: rgba(12, 13, 18, 0.85);
       display: flex; flex-direction: column;
       font-family: "JetBrains Mono", Consolas, monospace; font-size: 0.8rem;
+      flex-shrink: 0;
     }
 
-    .console-logs { flex: 1; overflow-y: auto; padding: 8px 12px; color: #a6adc8; }
+    .console-logs { flex: 1; overflow-y: auto; padding: 8px 12px; color: #a6adc8; min-height: 0; }
     .log-line { margin-bottom: 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); padding-bottom: 2px; white-space: pre-wrap; word-break: break-all; }
     .log-info { color: #89b4fa; } .log-warn { color: #f9e2af; } .log-error { color: #f38ba8; }
 
@@ -306,6 +317,7 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 14px;
       overflow: hidden;
+      min-width: 0;
     }
 
     .CodeMirror {
@@ -369,9 +381,10 @@
     }
 
     @media (max-width: 900px) {
-      .workbench { flex-direction: column-reverse; }
-      .sidebar-panel { width: 100%; height: 250px; }
-      .panel-preview, .panel-editor { width: 100%; height: 50%; }
+      body { height: auto; min-height: 100vh; overflow: auto; }
+      .workbench { flex-direction: column-reverse; height: auto; }
+      .sidebar-panel { width: 100%; height: 350px; }
+      .panel-preview, .panel-editor { width: 100%; height: 400px; }
     }
   </style>
 </head>

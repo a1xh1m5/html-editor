@@ -630,17 +630,21 @@
 
     <!-- Collapsible Sidebar: Gemini AI Chat -->
     <div class="sidebar-panel collapsed" id="ai-panel">
-      <div class="panel-header">
+      <div class="panel-header" style="flex-wrap: wrap; gap: 4px;">
         <span style="display:flex; align-items:center; gap:6px; color:#ffffff;">
           <svg class="material-icon" viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 12l7.19 3.37L12 22l2.81-6.63L22 12l-7.19-3.37L12 2z"/></svg>
           Agent
         </span>
-        <div style="display:flex; gap:4px; align-items:center;">
+        <div style="display:flex; gap:4px; align-items:center; margin-left:auto;">
+          <select id="api-mode-select" onchange="changeApiMode(this.value)" class="model-select" title="API Mode Choice">
+            <option value="public">Public Proxy</option>
+            <option value="client">Client Key</option>
+          </select>
           <select id="model-select" onchange="changeModel(this.value)" class="model-select" title="Select Gemini Model">
             <option value="gemini-1.5-flash">1.5 Flash</option>
             <option value="gemini-1.5-pro">1.5 Pro</option>
           </select>
-          <button class="btn" onclick="configureCustomApiKey()" style="padding:2px 6px; font-size:0.7rem;" title="Set Custom Client API Key">Key</button>
+          <button class="btn" id="key-settings-btn" onclick="configureCustomApiKey()" style="padding:2px 6px; font-size:0.7rem; display:none;" title="Set Custom Client API Key">Key</button>
           <button class="btn" onclick="clearAIChat()" style="padding:2px 6px; font-size:0.7rem;">Clear</button>
         </div>
       </div>
@@ -753,14 +757,18 @@
 </body>
 </html>`;
 
-    // Model Selector Engine
+    // Model & API Mode Selector Engine
     let currentModel = localStorage.getItem('gemini_selected_model') || 'gemini-1.5-flash';
+    let apiMode = localStorage.getItem('gemini_api_mode') || 'public';
 
-    function initModelSelect() {
-      const select = document.getElementById('model-select');
-      if (select) {
-        select.value = currentModel;
-      }
+    function initModelAndApiSelect() {
+      const modelSelect = document.getElementById('model-select');
+      if (modelSelect) modelSelect.value = currentModel;
+
+      const apiModeSelect = document.getElementById('api-mode-select');
+      if (apiModeSelect) apiModeSelect.value = apiMode;
+
+      updateKeyBtnVisibility();
     }
 
     function changeModel(val) {
@@ -768,17 +776,34 @@
       localStorage.setItem('gemini_selected_model', val);
     }
 
+    function changeApiMode(val) {
+      apiMode = val;
+      localStorage.setItem('gemini_api_mode', val);
+      updateKeyBtnVisibility();
+
+      if (val === 'client' && !localStorage.getItem('user_gemini_api_key')) {
+        configureCustomApiKey();
+      }
+    }
+
+    function updateKeyBtnVisibility() {
+      const keyBtn = document.getElementById('key-settings-btn');
+      if (keyBtn) {
+        keyBtn.style.display = apiMode === 'client' ? 'inline-block' : 'none';
+      }
+    }
+
     function configureCustomApiKey() {
       const currentKey = localStorage.getItem('user_gemini_api_key') || '';
-      const newKey = prompt("Enter custom Gemini API key (Leave empty to use default public Worker proxy):", currentKey);
+      const newKey = prompt("Enter your personal Gemini API key:", currentKey);
 
       if (newKey !== null) {
         if (newKey.trim() === '') {
           localStorage.removeItem('user_gemini_api_key');
-          alert("Custom API key removed. Reverted to default Worker proxy.");
+          alert("Key cleared. Switch API Mode to 'Public Proxy' if you don't have a personal key.");
         } else {
           localStorage.setItem('user_gemini_api_key', newKey.trim());
-          alert("Custom API key saved! AI requests will now go directly to Google using your key.");
+          alert("Custom API key saved!");
         }
       }
     }
@@ -1152,6 +1177,15 @@
       const userPrompt = promptInput.value.trim();
       if (!userPrompt) return;
 
+      const customApiKey = localStorage.getItem('user_gemini_api_key');
+
+      // Check if user is in Client Key mode without a saved key
+      if (apiMode === 'client' && (!customApiKey || customApiKey.trim() === '')) {
+        alert("Please set your personal Gemini API key first using the 'KEY' button.");
+        configureCustomApiKey();
+        return;
+      }
+
       appendChatMsg('user', userPrompt);
       promptInput.value = '';
 
@@ -1176,19 +1210,16 @@ IMPORTANT: Your response should include:
         parts: [{ text: `${systemInstruction}\n\n[USER REQUEST]: ${userPrompt}\n\n[ATTACHED CURRENT CODE]:\n\`\`\`html\n${currentCode}\n\`\`\`` }]
       });
 
-      // Check if user set a custom client-side key
-      const customApiKey = localStorage.getItem('user_gemini_api_key');
-
       let requestUrl = '/api/generate';
       let requestHeaders = { 'Content-Type': 'application/json' };
       let requestBody = {};
 
-      if (customApiKey && customApiKey.trim() !== '') {
-        // Direct Client API Route
+      if (apiMode === 'client') {
+        // Direct Client-Side Request
         requestUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${customApiKey.trim()}`;
         requestBody = { contents: contentsPayload };
       } else {
-        // Public Worker Backend Route
+        // Public Worker Backend Proxy Request
         requestUrl = '/api/generate';
         requestBody = {
           model: targetModel,
@@ -1289,7 +1320,7 @@ IMPORTANT: Your response should include:
     }
 
     // Initial Load Execution
-    initModelSelect();
+    initModelAndApiSelect();
     renderProjectsList();
     loadActiveProject();
     if (window.innerWidth <= 850) {

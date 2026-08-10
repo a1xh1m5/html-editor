@@ -1,0 +1,3 @@
+The daily update for today (Mon Aug 10, 2026) will include updates to the Cloudfare Pages mirror of the site (html-editor.alxhlms.workers.dev) and it will include a public API key for use, with a fallback system to contact 3.5 Flash Lite when rate limits are hitfor 3.6 Flash.
+
+As of now, 2:55 PM, The update has not been pushed and will probably take me some time.

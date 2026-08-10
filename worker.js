@@ -1,50 +1,67 @@
 export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-
-    // Secure backend endpoint: handles requests sent from index.html
-    if (url.pathname === "/api/generate") {
-      if (request.method !== "POST") {
-        return new Response("Method Not Allowed", { status: 405 });
-      }
-
-      try {
-        const body = await request.json();
-
-        // 1. Fetch your secret key stored in Cloudflare Workers
-        const apiKey = env.API_KEY;
-
-        if (!apiKey) {
-          return new Response(
-            JSON.stringify({ error: "API key is not configured in Cloudflare." }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
-          );
-        }
-
-        // 2. Forward request to external API using the hidden key
-        const apiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        });
-
-        const data = await apiResponse.json();
-        return new Response(JSON.stringify(data), {
-          headers: { "Content-Type": "application/json" },
-        });
-
-      } catch (err) {
-        return new Response(
-          JSON.stringify({ error: err.message }),
-          { status: 500, headers: { "Content-Type": "application/json" } }
-        );
-      }
+  async fetch(request, env) {
+    // Handle CORS Preflight (OPTIONS request)
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      });
     }
 
-    // Serve static files (index.html, CSS, etc.)
-    return env.ASSETS.fetch(request);
-  },
+    // Only allow POST requests to /api/generate
+    const url = new URL(request.url);
+    if (request.method !== "POST" || url.pathname !== "/api/generate") {
+      return new Response(JSON.stringify({ error: { message: "Not found" } }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    try {
+      const body = await request.json();
+      const model = body.model || "gemini-1.5-flash";
+      const contents = body.contents || [];
+
+      // Ensure API key is configured
+      if (!env.GEMINI_API_KEY) {
+        return new Response(JSON.stringify({ error: { message: "GEMINI_API_KEY is missing in Worker variables." } }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+
+      // Direct request to Google Gemini API
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`;
+
+      const response = await fetch(geminiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ contents })
+      });
+
+      const data = await response.json();
+
+      return new Response(JSON.stringify(data), {
+        status: response.status,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
+        }
+      });
+
+    } catch (err) {
+      return new Response(JSON.stringify({ error: { message: err.message || "Internal Worker Error" } }), {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
+        }
+      });
+    }
+  }
 };

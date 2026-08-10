@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HTML Studio</title>
+  <title>HTML Studio - AI Edition</title>
   
   <!-- CodeMirror CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
@@ -17,7 +17,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
 
-  <!-- CodeMirror Editing & Autocomplete Addons -->
+  <!-- Editing, Formatting & Autocomplete Addons -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
@@ -26,26 +26,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/javascript-hint.min.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Smoked Dark Glass Theme */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: radial-gradient(circle at top left, #1a1c23, #0f1015);
       color: #e2e8f0;
       height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      padding: 12px;
-      gap: 12px;
+      padding: 10px;
+      gap: 10px;
     }
 
-    /* Utility Class for Material Icons */
     .material-icon {
       width: 18px;
       height: 18px;
@@ -54,55 +48,50 @@
       vertical-align: middle;
     }
 
+    /* VS Code Header */
     header {
       height: 48px;
       background: rgba(24, 26, 35, 0.65);
       backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
+      padding: 0 14px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
     }
 
     .title {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 600;
       color: #cba6f7;
       display: flex;
       align-items: center;
       gap: 8px;
-      letter-spacing: 0.02em;
     }
 
-    .actions {
-      display: flex;
-      gap: 8px;
-    }
+    .actions { display: flex; gap: 8px; }
 
     .btn {
       background: rgba(255, 255, 255, 0.05);
       color: #cbd5e1;
       border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 6px 12px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 500;
       border-radius: 8px;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
     }
 
     .btn:hover {
       background: rgba(255, 255, 255, 0.12);
       border-color: rgba(255, 255, 255, 0.2);
-      color: #ffffff;
+      color: #fff;
     }
 
     .btn-primary {
@@ -114,20 +103,139 @@
     .btn-primary:hover {
       background: rgba(137, 180, 250, 0.25);
       color: #b4befe;
-      border-color: rgba(137, 180, 250, 0.5);
     }
 
-    .container {
+    .btn-accent {
+      background: rgba(203, 166, 247, 0.15);
+      color: #cba6f7;
+      border: 1px solid rgba(203, 166, 247, 0.3);
+    }
+
+    .btn-accent:hover {
+      background: rgba(203, 166, 247, 0.25);
+    }
+
+    /* Main Workbench Layout */
+    .workbench {
       display: flex;
       flex: 1;
-      height: calc(100vh - 72px);
-      width: 100%;
+      height: calc(100vh - 68px);
+      gap: 10px;
+    }
+
+    /* Left Activity Bar & AI Sidebar */
+    .activity-bar {
+      width: 46px;
+      background: rgba(24, 26, 35, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 0;
       gap: 12px;
     }
 
-    /* Left Side Panel */
+    .activity-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .activity-btn:hover, .activity-btn.active {
+      color: #cba6f7;
+      background: rgba(203, 166, 247, 0.15);
+    }
+
+    /* AI Sidebar Panel */
+    .sidebar-panel {
+      width: 320px;
+      height: 100%;
+      background: rgba(24, 26, 35, 0.55);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-panel.collapsed {
+      display: none;
+    }
+
+    .ai-chat-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .msg {
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .msg-user {
+      background: rgba(137, 180, 250, 0.15);
+      border: 1px solid rgba(137, 180, 250, 0.2);
+      color: #89b4fa;
+      align-self: flex-end;
+    }
+
+    .msg-ai {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #e2e8f0;
+      align-self: flex-start;
+    }
+
+    .ai-input-box {
+      padding: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: rgba(18, 19, 26, 0.7);
+    }
+
+    .ai-input-box textarea {
+      width: 100%;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      padding: 8px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      resize: none;
+      outline: none;
+    }
+
+    .ai-input-box textarea:focus {
+      border-color: rgba(203, 166, 247, 0.5);
+    }
+
+    /* Live Preview Panel */
     .panel-preview {
-      width: 50%;
+      flex: 1;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -136,7 +244,6 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     }
 
     .panel-header {
@@ -163,72 +270,34 @@
     }
 
     iframe#preview-frame {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background-color: #ffffff;
+      width: 100%; height: 100%; border: none; background: #ffffff;
     }
 
-    /* Resizer Bar (Allocation Handle) */
+    /* Resizer Handle & Console Panel */
     .resize-handle {
       height: 6px;
       background: rgba(255, 255, 255, 0.05);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       cursor: row-resize;
-      transition: background 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
     }
+    .resize-handle:hover, .resize-handle.active { background: rgba(137, 180, 250, 0.3); }
+    .resize-handle::after { content: ""; width: 32px; height: 2px; background: rgba(255, 255, 255, 0.2); }
 
-    .resize-handle:hover, .resize-handle.active {
-      background: rgba(137, 180, 250, 0.3);
-    }
-
-    .resize-handle::after {
-      content: "";
-      width: 32px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 2px;
-    }
-
-    /* Resizable Bottom Console Panel */
     .console-panel {
-      height: 160px;
-      min-height: 40px;
-      max-height: 80%;
-      background: rgba(12, 13, 18, 0.8);
-      display: flex;
-      flex-direction: column;
-      font-family: "JetBrains Mono", Consolas, monospace;
-      font-size: 0.8rem;
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 14px;
+      height: 140px; min-height: 35px; max-height: 70%;
+      background: rgba(12, 13, 18, 0.85);
+      display: flex; flex-direction: column;
+      font-family: "JetBrains Mono", Consolas, monospace; font-size: 0.8rem;
     }
 
-    .console-logs {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px;
-      color: #a6adc8;
-    }
+    .console-logs { flex: 1; overflow-y: auto; padding: 8px 12px; color: #a6adc8; }
+    .log-line { margin-bottom: 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); padding-bottom: 2px; white-space: pre-wrap; word-break: break-all; }
+    .log-info { color: #89b4fa; } .log-warn { color: #f9e2af; } .log-error { color: #f38ba8; }
 
-    .log-line {
-      margin-bottom: 4px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      padding-bottom: 4px;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-    .log-info { color: #89b4fa; }
-    .log-warn { color: #f9e2af; }
-    .log-error { color: #f38ba8; }
-
-    /* Right Side Panel: Code Editor */
+    /* Code Editor Panel */
     .panel-editor {
-      width: 50%;
+      flex: 1;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -237,16 +306,14 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     }
 
     .CodeMirror {
       height: 100% !important;
-      font-family: "JetBrains Mono", "Fira Code", Consolas, Monaco, monospace;
+      font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
       font-size: 14px;
       line-height: 1.5;
       background: transparent !important;
-      padding: 6px 0;
     }
 
     .CodeMirror-gutters {
@@ -256,51 +323,55 @@
 
     /* Modal Styling */
     .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(8px);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px);
+      justify-content: center; align-items: center; z-index: 1000;
     }
 
     .modal-content {
-      background: rgba(24, 26, 35, 0.9);
+      background: rgba(24, 26, 35, 0.95);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 14px;
-      padding: 20px;
-      width: 420px;
-      max-width: 90%;
+      border-radius: 14px; padding: 20px; width: 440px; max-width: 90%;
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
     }
 
     .modal-content h3 {
-      margin-bottom: 14px;
-      color: #cba6f7;
-      font-size: 1.05rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      margin-bottom: 14px; color: #cba6f7; font-size: 1.05rem;
+      display: flex; align-items: center; gap: 8px;
     }
 
     .lib-option {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column-reverse;
-      }
-      .panel-preview, .panel-editor {
-        width: 100%;
-        height: 50%;
-      }
+    /* Proposed AI Edit Drawer */
+    .diff-drawer {
+      display: none;
+      position: fixed;
+      bottom: 20px; right: 20px; width: 480px; max-width: 90%;
+      background: rgba(24, 26, 35, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(203, 166, 247, 0.4);
+      border-radius: 14px; padding: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+      z-index: 999;
+      flex-direction: column; gap: 10px;
+    }
+
+    .diff-drawer h4 { color: #cba6f7; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+
+    .diff-preview {
+      height: 140px; background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
+      font-family: monospace; font-size: 0.75rem; padding: 8px;
+      overflow: auto; color: #a6adc8; white-space: pre-wrap;
+    }
+
+    @media (max-width: 900px) {
+      .workbench { flex-direction: column-reverse; }
+      .sidebar-panel { width: 100%; height: 250px; }
+      .panel-preview, .panel-editor { width: 100%; height: 50%; }
     }
   </style>
 </head>
@@ -312,9 +383,17 @@
       HTML Studio
     </div>
     <div class="actions">
+      <button class="btn" onclick="toggleWrap()" title="Toggle Line Wrap">
+        <svg class="material-icon" viewBox="0 0 24 24"><path d="M4 19h6v-2H4v2zM20 5H4v2h16V5zm-3 6H4v2h13c1.1 0 2 .9 2 2v1c0 1.1-.9 2-2 2h-3l2.5-2.5L15 12l-5 5 5 5 1.5-1.5L14 18h3c2.21 0 4-1.79 4-4v-1c0-2.21-1.79-4-4-4z"/></svg>
+        Wrap
+      </button>
+      <button class="btn" onclick="openKeyModal()">
+        <svg class="material-icon" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+        Gemini Key
+      </button>
       <button class="btn" onclick="openLibraryModal()">
         <svg class="material-icon" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-        Libraries
+        Libs
       </button>
       <button class="btn" onclick="downloadHTML()">
         <svg class="material-icon" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -327,8 +406,38 @@
     </div>
   </header>
 
-  <div class="container">
-    <!-- Left: Live Preview + Resizable Console -->
+  <div class="workbench">
+    <!-- VSCode Activity Bar -->
+    <div class="activity-bar">
+      <button class="activity-btn active" id="ai-toggle-btn" onclick="toggleSidebar()" title="Gemini AI Copilot">
+        <svg class="material-icon" viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 12l7.19 3.37L12 22l2.81-6.63L22 12l-7.19-3.37L12 2z"/></svg>
+      </button>
+    </div>
+
+    <!-- Collapsible Gemini AI Sidebar -->
+    <div class="sidebar-panel" id="sidebar-panel">
+      <div class="panel-header">
+        <span style="display:flex; align-items:center; gap:6px; color:#cba6f7;">
+          <svg class="material-icon" viewBox="0 0 24 24"><path d="M12 2L9.19 8.63 2 12l7.19 3.37L12 22l2.81-6.63L22 12l-7.19-3.37L12 2z"/></svg>
+          Gemini Agent
+        </span>
+        <button class="btn" onclick="clearAIChat()" style="padding:2px 6px; font-size:0.7rem;">Clear</button>
+      </div>
+
+      <div class="ai-chat-body" id="ai-chat-body">
+        <div class="msg msg-ai">Hey! I'm your Gemini Copilot. Ask me anything, or tell me what to fix/add in your code.</div>
+      </div>
+
+      <div class="ai-input-box">
+        <textarea id="ai-user-prompt" placeholder="Ask AI to fix, edit, or build... (Code attached automatically)"></textarea>
+        <button class="btn btn-accent" onclick="sendToGemini()" style="justify-content:center;">
+          <svg class="material-icon" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          Ask Copilot
+        </button>
+      </div>
+    </div>
+
+    <!-- Center: Live Preview + Console -->
     <div class="panel-preview">
       <div class="panel-header">
         <span>Live Preview</span>
@@ -337,17 +446,12 @@
         <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
       </div>
       
-      <!-- Console Allocation Resizer Handle -->
       <div class="resize-handle" id="resizer"></div>
 
-      <!-- Resizable Console Area -->
       <div class="console-panel" id="console-panel">
         <div class="panel-header">
           <span>Console Output</span>
-          <button class="btn" onclick="clearConsole()" style="padding:2px 8px; font-size:0.7rem;">
-            <svg class="material-icon" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h5v2h-5zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zM14 5h-3l-1-1H6L5 5H2v2h12z"/></svg>
-            Clear
-          </button>
+          <button class="btn" onclick="clearConsole()" style="padding:2px 8px; font-size:0.7rem;">Clear</button>
         </div>
         <div id="console-logs" class="console-logs"></div>
       </div>
@@ -357,90 +461,77 @@
     <div class="panel-editor">
       <div class="panel-header">
         <span>HTML Source</span>
-        <span style="font-size:0.7rem; color:#64748b;">Press Ctrl+Space for autocomplete</span>
+        <span style="font-size:0.7rem; color:#64748b;">Auto-Saved | Ctrl+Space</span>
       </div>
       <textarea id="code-input" autocapitalize="off" autocomplete="off" spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <!-- Proposed Code Diff Approval Drawer -->
+  <div class="diff-drawer" id="diff-drawer">
+    <h4>
+      <svg class="material-icon" viewBox="0 0 24 24"><path d="M21 10.12h-6.78l.97-4.66c.04-.2.01-.41-.08-.59l-.01-.01L14.07 4 7.04 11.03C6.64 11.43 6.4 11.98 6.4 12.58V20c0 1.1.9 2 2 2h8c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2.07c0-.45-.36-.81-.8-.81zM3 12v8h2v-8H3z"/></svg>
+      Gemini Proposed Code Edits
+    </h4>
+    <div class="diff-preview" id="diff-preview-text"></div>
+    <div style="display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn" onclick="rejectProposedCode()">Discard</button>
+      <button class="btn btn-accent" onclick="agreeAndApplyCode()">Agree & Apply Code</button>
+    </div>
+  </div>
+
+  <!-- Gemini Key Modal -->
+  <div id="key-modal" class="modal">
+    <div class="modal-content">
+      <h3>
+        <svg class="material-icon" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+        Gemini API Key
+      </h3>
+      <p style="font-size:0.8rem; color:#94a3b8; margin-bottom:12px;">Your key stays locally in your browser's localStorage.</p>
+      <input type="password" id="gemini-key-input" placeholder="AIzaSy..." style="width:100%; padding:8px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; font-family:monospace; margin-bottom:14px;">
+      <div style="text-align:right; display:flex; gap:8px; justify-content:flex-end;">
+        <button class="btn" onclick="closeKeyModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveKey()">Save Key</button>
+      </div>
     </div>
   </div>
 
   <!-- Library Injector Modal -->
   <div id="lib-modal" class="modal">
     <div class="modal-content">
-      <h3>
-        <svg class="material-icon" viewBox="0 0 24 24"><path d="M12 2l-5.5 9h11z"/><circle cx="17.5" cy="17.5" r="4.5"/><path d="M3 13.5h8v8H3z"/></svg>
-        Inject Libraries
-      </h3>
-      <div class="lib-option">
-        <span>Tailwind CSS v3</span>
-        <button class="btn" onclick="injectLibrary('tailwind')">Add</button>
-      </div>
-      <div class="lib-option">
-        <span>Font Awesome Icons</span>
-        <button class="btn" onclick="injectLibrary('fontawesome')">Add</button>
-      </div>
-      <div class="lib-option">
-        <span>Bootstrap CSS v5</span>
-        <button class="btn" onclick="injectLibrary('bootstrap')">Add</button>
-      </div>
-      <div class="lib-option">
-        <span>jQuery v3.7</span>
-        <button class="btn" onclick="injectLibrary('jquery')">Add</button>
-      </div>
-      <div class="lib-option">
-        <span>Three.js (3D Graphics)</span>
-        <button class="btn" onclick="injectLibrary('threejs')">Add</button>
-      </div>
-      <div style="margin-top: 16px; text-align: right;">
-        <button class="btn" onclick="closeLibraryModal()">Close</button>
-      </div>
+      <h3>Inject Libraries</h3>
+      <div class="lib-option"><span>Tailwind CSS v3</span><button class="btn" onclick="injectLibrary('tailwind')">Add</button></div>
+      <div class="lib-option"><span>Font Awesome Icons</span><button class="btn" onclick="injectLibrary('fontawesome')">Add</button></div>
+      <div class="lib-option"><span>Bootstrap CSS v5</span><button class="btn" onclick="injectLibrary('bootstrap')">Add</button></div>
+      <div class="lib-option"><span>jQuery v3.7</span><button class="btn" onclick="injectLibrary('jquery')">Add</button></div>
+      <div class="lib-option"><span>Three.js (3D Graphics)</span><button class="btn" onclick="injectLibrary('threejs')">Add</button></div>
+      <div style="margin-top: 16px; text-align: right;"><button class="btn" onclick="closeLibraryModal()">Close</button></div>
     </div>
   </div>
 
   <script>
-    const starterCode = `<!DOCTYPE html>
+    const defaultStarter = `<!DOCTYPE html>
 <html>
 <head>
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      background: #0f172a;
-      color: #f8fafc;
-    }
+    body { font-family: sans-serif; padding: 20px; background: #0f172a; color: #f8fafc; }
     h1 { color: #38bdf8; }
-    .card {
-      background: #1e293b;
-      padding: 16px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      margin-bottom: 15px;
-    }
-    button {
-      background: #38bdf8;
-      color: #0f172a;
-      font-weight: bold;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+    .card { background: #1e293b; padding: 16px; border-radius: 10px; border: 1px solid #334155; margin-bottom: 15px; }
+    button { background: #38bdf8; color: #0f172a; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
   </style>
 </head>
 <body>
   <h1>Live Studio</h1>
-  <div class="card">
-    <p>Edit the code on the right panel to see real-time changes.</p>
-  </div>
-
-  <button onclick="console.log('Button clicked! Current time:', new Date().toLocaleTimeString())">
-    Test Console Output
-  </button>
+  <div class="card"><p>Edit code or use Gemini Copilot to generate features!</p></div>
+  <button onclick="console.log('Clicked at', new Date().toLocaleTimeString())">Test Console</button>
 </body>
 </html>`;
 
-    document.getElementById('code-input').value = starterCode;
+    // Local Storage Recovery
+    const savedCode = localStorage.getItem('studio_code') || defaultStarter;
+    document.getElementById('code-input').value = savedCode;
 
-    // CodeMirror Initialization
+    // CodeMirror Setup
     const editor = CodeMirror.fromTextArea(document.getElementById('code-input'), {
       mode: 'htmlmixed',
       theme: 'dracula',
@@ -449,18 +540,14 @@
       autoCloseBrackets: true,
       lineWrapping: true,
       tabSize: 2,
-      extraKeys: {
-        "Ctrl-Space": "autocomplete"
-      }
+      extraKeys: { "Ctrl-Space": "autocomplete" }
     });
 
-    // Disable autocorrect and spellcheck on CodeMirror input area
     const inputArea = editor.getInputField();
     inputArea.setAttribute('autocorrect', 'off');
     inputArea.setAttribute('autocapitalize', 'off');
     inputArea.setAttribute('spellcheck', 'false');
 
-    // Auto hint suggestions
     editor.on("inputRead", function(cm, change) {
       if (change.origin !== "+input") return;
       if (change.text[0] === "<" || change.text[0] === " " || /[a-zA-Z]/.test(change.text[0])) {
@@ -468,10 +555,17 @@
       }
     });
 
+    // Toggle Line Wrap
+    let isWrapped = true;
+    function toggleWrap() {
+      isWrapped = !isWrapped;
+      editor.setOption('lineWrapping', isWrapped);
+    }
+
+    // Live Render & Console
     const iframe = document.getElementById('preview-frame');
     const consoleLogs = document.getElementById('console-logs');
 
-    // Console interceptor
     function logToConsole(type, msg) {
       const line = document.createElement('div');
       line.className = `log-line log-${type}`;
@@ -480,9 +574,7 @@
       consoleLogs.scrollTop = consoleLogs.scrollHeight;
     }
 
-    function clearConsole() {
-      consoleLogs.innerHTML = '';
-    }
+    function clearConsole() { consoleLogs.innerHTML = ''; }
 
     const consoleHookScript = `
       <script>
@@ -493,9 +585,7 @@
               window.parent.postMessage({ type: 'CONSOLE_LOG', logType: type, message: msg }, '*');
             } catch(e) {}
           }
-          const origLog = console.log;
-          const origWarn = console.warn;
-          const origError = console.error;
+          const origLog = console.log; const origWarn = console.warn; const origError = console.error;
           console.log = function() { origLog.apply(console, arguments); sendLog('info', arguments); };
           console.warn = function() { origWarn.apply(console, arguments); sendLog('warn', arguments); };
           console.error = function() { origError.apply(console, arguments); sendLog('error', arguments); };
@@ -511,14 +601,14 @@
 
     function updatePreview() {
       const code = editor.getValue();
+      localStorage.setItem('studio_code', code); // Auto-save
+
       let finalCode = code.includes('<head>') 
         ? code.replace('<head>', '<head>' + consoleHookScript) 
         : consoleHookScript + code;
 
       const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-      iframeDoc.open();
-      iframeDoc.write(finalCode);
-      iframeDoc.close();
+      iframeDoc.open(); iframeDoc.write(finalCode); iframeDoc.close();
     }
 
     let timeout;
@@ -526,66 +616,154 @@
       clearTimeout(timeout);
       timeout = setTimeout(updatePreview, 300);
     });
-
     updatePreview();
 
-    // Console Allocation / Resizing Drag Script
+    // Resizer Handle
     const resizer = document.getElementById('resizer');
     const consolePanel = document.getElementById('console-panel');
-    let isResizing = false;
-    let startY, startHeight;
+    let isResizing = false, startY, startHeight;
 
     resizer.addEventListener('mousedown', (e) => {
-      isResizing = true;
-      startY = e.clientY;
-      startHeight = consolePanel.offsetHeight;
-      resizer.classList.add('active');
-      document.body.style.cursor = 'row-resize';
-      document.body.style.userSelect = 'none';
+      isResizing = true; startY = e.clientY; startHeight = consolePanel.offsetHeight;
+      resizer.classList.add('active'); document.body.style.cursor = 'row-resize';
     });
-
     document.addEventListener('mousemove', (e) => {
       if (!isResizing) return;
-      const dy = startY - e.clientY;
-      const newHeight = startHeight + dy;
-      if (newHeight >= 35 && newHeight <= window.innerHeight * 0.75) {
-        consolePanel.style.height = `${newHeight}px`;
-      }
+      const newHeight = startHeight + (startY - e.clientY);
+      if (newHeight >= 35 && newHeight <= window.innerHeight * 0.7) consolePanel.style.height = `${newHeight}px`;
     });
-
     document.addEventListener('mouseup', () => {
-      if (isResizing) {
-        isResizing = false;
-        resizer.classList.remove('active');
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-      }
+      if (isResizing) { isResizing = false; resizer.classList.remove('active'); document.body.style.cursor = ''; }
     });
 
+    // Gemini API & Sidebar Logic
+    let proposedCode = "";
+
+    function toggleSidebar() {
+      const panel = document.getElementById('sidebar-panel');
+      const btn = document.getElementById('ai-toggle-btn');
+      panel.classList.toggle('collapsed');
+      btn.classList.toggle('active');
+    }
+
+    function openKeyModal() {
+      document.getElementById('gemini-key-input').value = localStorage.getItem('gemini_api_key') || '';
+      document.getElementById('key-modal').style.display = 'flex';
+    }
+    function closeKeyModal() { document.getElementById('key-modal').style.display = 'none'; }
+    function saveKey() {
+      const k = document.getElementById('gemini-key-input').value.trim();
+      localStorage.setItem('gemini_api_key', k);
+      closeKeyModal();
+      appendAIMessage("Key saved successfully!");
+    }
+
+    function appendUserMessage(text) {
+      const box = document.getElementById('ai-chat-body');
+      const msg = document.createElement('div');
+      msg.className = 'msg msg-user'; msg.innerText = text;
+      box.appendChild(msg); box.scrollTop = box.scrollHeight;
+    }
+
+    function appendAIMessage(text) {
+      const box = document.getElementById('ai-chat-body');
+      const msg = document.createElement('div');
+      msg.className = 'msg msg-ai'; msg.innerText = text;
+      box.appendChild(msg); box.scrollTop = box.scrollHeight;
+      return msg;
+    }
+
+    function clearAIChat() { document.getElementById('ai-chat-body').innerHTML = ''; }
+
+    async function sendToGemini() {
+      const key = localStorage.getItem('gemini_api_key');
+      if (!key) { openKeyModal(); return; }
+
+      const promptInput = document.getElementById('ai-user-prompt');
+      const userPrompt = promptInput.value.trim();
+      if (!userPrompt) return;
+
+      appendUserMessage(userPrompt);
+      promptInput.value = '';
+
+      const currentCode = editor.getValue();
+      const aiMsgElement = appendAIMessage("Thinking...");
+
+      const systemInstruction = `You are a web dev copilot. The user has attached their current HTML page code below.
+Follow user requests to modify, fix, or enhance code. 
+IMPORTANT: Your response should include:
+1. Short conversational explanation.
+2. The FULL updated HTML inside a standard \`\`\`html code block.`;
+
+      const payload = {
+        contents: [{
+          parts: [{ text: `${systemInstruction}\n\n[USER REQUEST]: ${userPrompt}\n\n[ATTACHED CURRENT CODE]:\n\`\`\`html\n${currentCode}\n\`\`\`` }]
+        }]
+      };
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        if (data.error) {
+          aiMsgElement.innerText = "Error: " + data.error.message;
+          return;
+        }
+
+        const reply = data.candidates[0].content.parts[0].text;
+        
+        // Extract HTML code block if present
+        const codeMatch = reply.match(/```html\n([\s\S]*?)\n```/);
+        if (codeMatch && codeMatch[1]) {
+          proposedCode = codeMatch[1];
+          const cleanText = reply.replace(/```html[\s\S]*?```/, '').trim();
+          aiMsgElement.innerText = cleanText || "I've generated the updated code. Review and apply it below!";
+          showDiffDrawer(proposedCode);
+        } else {
+          aiMsgElement.innerText = reply;
+        }
+
+      } catch (err) {
+        aiMsgElement.innerText = "Failed to communicate with Gemini API. Check console/API key.";
+      }
+    }
+
+    // Agree / Discard Diff Drawer
+    function showDiffDrawer(code) {
+      document.getElementById('diff-preview-text').innerText = code;
+      document.getElementById('diff-drawer').style.display = 'flex';
+    }
+
+    function rejectProposedCode() {
+      document.getElementById('diff-drawer').style.display = 'none';
+      proposedCode = "";
+    }
+
+    function agreeAndApplyCode() {
+      if (proposedCode) {
+        editor.setValue(proposedCode);
+        rejectProposedCode();
+      }
+    }
+
+    // Modal & Download Functions
     function openInNewTab() {
-      const code = editor.getValue();
-      const blob = new Blob([code], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
+      const blob = new Blob([editor.getValue()], { type: 'text/html' });
+      window.open(URL.createObjectURL(blob), '_blank');
     }
 
     function downloadHTML() {
-      const code = editor.getValue();
-      const blob = new Blob([code], { type: 'text/html' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'index.html';
-      a.click();
-      URL.revokeObjectURL(a.href);
+      const blob = new Blob([editor.getValue()], { type: 'text/html' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'index.html'; a.click(); URL.revokeObjectURL(a.href);
     }
 
-    function openLibraryModal() {
-      document.getElementById('lib-modal').style.display = 'flex';
-    }
-
-    function closeLibraryModal() {
-      document.getElementById('lib-modal').style.display = 'none';
-    }
+    function openLibraryModal() { document.getElementById('lib-modal').style.display = 'flex'; }
+    function closeLibraryModal() { document.getElementById('lib-modal').style.display = 'none'; }
 
     const libraries = {
       tailwind: '<script src="https://cdn.tailwindcss.com"><\/script>',
@@ -596,15 +774,10 @@
     };
 
     function injectLibrary(key) {
-      const libTag = libraries[key];
       let code = editor.getValue();
-      if (code.includes('</head>')) {
-        code = code.replace('</head>', `  ${libTag}\n</head>`);
-      } else {
-        code = libTag + '\n' + code;
-      }
-      editor.setValue(code);
-      closeLibraryModal();
+      const tag = libraries[key];
+      code = code.includes('</head>') ? code.replace('</head>', `  ${tag}\n</head>`) : tag + '\n' + code;
+      editor.setValue(code); closeLibraryModal();
     }
   </script>
 </body>
